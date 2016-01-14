@@ -5,6 +5,7 @@ import datetime
 from PIL import Image, ImageFilter
 from twython import Twython
 import base64
+import os
 
 def newspaper_file(filename):
     '''
@@ -33,6 +34,7 @@ def newspaper_file(filename):
     save = open(filename, 'wb')
     save.write(data)
     save.close()
+    print 'Got it!'
 
 
 def splice_image(newspaper_file, base_file, new_file):
@@ -40,7 +42,8 @@ def splice_image(newspaper_file, base_file, new_file):
     Splices a new newspaper cover into the base picture
     '''
     
-	#Opens the two images:
+    print 'Splicing...'
+    #Opens the two images:
     im = Image.open(base_file)
     impage = Image.open(newspaper_file)
 
@@ -53,28 +56,30 @@ def splice_image(newspaper_file, base_file, new_file):
     im.paste(imblur, (950, 110), mask=mask)
     imResize = im.resize((597,600), Image.ANTIALIAS)
     imResize.save(new_file, 'JPEG', quality=90)
-
+    print 'Spliced!'
 
 
 def post_to_twitter(filename):
-	'''
-	Posts the actual image to the twitters.
-	Requires a keys.json file, with app_key
-	'''
-	with open('keys.json') as f:
-		keys = eval(f.read())
-	
-	#Grabs the connection to twitter
-	twitter = Twython(app_key,
-					  app_secret,
-					  oauth_token,
-					  oauth_token_secret)
-	
-	with open(filename, "rb") as image_file:
-    	encoded_string = base64.b64encode(image_file.read())
-	
-	print 'Posting to twitter'
-	i = twitter.update_profile_image(image=encoded_string)
+    '''
+    Posts the actual image to the twitters.
+    Requires a keys.json file, with app_key
+    '''
+
+    print 'Posting to twitter'
+    with open('keys.json') as f:
+        keys = eval(f.read())
+    
+    #Grabs the connection to twitter
+    twitter = Twython(keys['app_key'],
+                      keys['app_secret'],
+                      keys['oauth_token'],
+                      keys['oauth_token_secret'])
+    
+    with open(filename, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read())
+    
+    i = twitter.update_profile_image(image=encoded_string)
+    print 'Posted!'
 
 
 if __name__ == "__main__":
@@ -83,7 +88,12 @@ if __name__ == "__main__":
     new_file = 'newimage.jpg'
     base_file = 'baseimage.jpg'
     
-    #Grabs the stuff
-    newspaper_file(news_file)
-    splice_image(news_file, base_file, new_file)
-    post_to_twitter(new_file)
+    #Using this as a scheduled task, when the computer is on, then just run it a bunch of times every day I guess.
+    if os.path.exists(news_file):
+        print 'Already done!!!'
+        pass
+    else:
+        #Grabs the stuff
+        newspaper_file(news_file)
+        splice_image(news_file, base_file, new_file)
+        post_to_twitter(new_file)
