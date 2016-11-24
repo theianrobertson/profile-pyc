@@ -44,9 +44,11 @@ def splice_image(newspaper_file, base_file, new_file):
     base_image = Image.open(base_file)
     page_image = Image.open(newspaper_file)
 
+    #Resize the base image to 700 x 1409 #MagicNumbers
+    page_image = page_image.resize((700, 1409), Image.ANTIALIAS)
+
     #Blurs
     page_blurred = page_image.filter(ImageFilter.GaussianBlur(radius=1))
-    page_blurred = page_blurred.resize(700, 1409)
 
     #Create a mask (invisible if >= 240 in greyscale)
     mask = page_image.convert('L')
@@ -92,7 +94,11 @@ if __name__ == "__main__":
     NEWS_FILE = 'img/' + datetime.date.today().strftime("%Y%m%d") + '.jpg'
     NEW_FILE = 'newimage.jpg'
     BASE_FILE = 'baseimage.jpg'
-    SLUG_CHOOSER = ('AZ_AR', 'CAN_TGAM')
+    #Just have a list of slugs that are there.
+    SLUG_CHOOSER = (
+        'AZ_AR', 'CAN_TGAM', 'CA_LAT', 'NY_NYT', 'CAN_HS', 'CAN_TS',
+        'RI_PJ', 'DC_WP', 'CA_SFC', 'AL_MA', 'CA_TU', 'CA_TT', 'CO_DS',
+        'FL_DLA', 'FL_VBPJ', 'GA_RNT', 'HI_SA', 'MN_DNT', 'MO_JG', 'NJ_TR')
     RANDOM_SLUG = random.choice(SLUG_CHOOSER)
 
     #Using this as a scheduled task, when the computer is on, then just
