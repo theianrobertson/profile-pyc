@@ -15,8 +15,14 @@ from twython import Twython
 
 
 def get_newspaper_file(filename, slug='CAN_TGAM'):
-    """
-    Reach out to a newspaper, grab a picture and save it.
+    """Reach out to a newspaper, grab a picture and save it.
+
+    Parameters
+    ----------
+    filename : str
+        Filename to save the image as
+    slug : str
+        The "slug" of the newspaper, which is in the URL of newseum
     """
 
     #This is hard-wired to grab the Globe and Mail.
@@ -31,7 +37,10 @@ def get_newspaper_file(filename, slug='CAN_TGAM'):
         with open(filename, 'wb') as out_file:
             resp.raw.decode_content = True
             shutil.copyfileobj(resp.raw, out_file)
-    print 'Got it!'
+        print 'Got it!'
+    else:
+        print('Oh snap something bad!')
+        print(resp)
 
 
 def splice_image(newspaper_file, base_file, new_file):
